@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Table, Button, Input, Space, Tag } from 'antd';
+import { Table, Button, Input, Space, Modal, Form, message } from 'antd';
 import { SearchOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { InputRef } from 'antd';
+
+const { TextArea } = Input;
 
 interface TaskType {
   id: string;
@@ -35,6 +37,11 @@ const initialTasks: TaskType[] = [
 export const TaskManager: React.FC = () => {
   const [tasks, setTasks] = useState<TaskType[]>(initialTasks);
   const searchInput = React.useRef<InputRef>(null);
+
+  // States for Edit Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<TaskType | null>(null);
+  const [form] = Form.useForm();
 
   const handleSearch = (selectedKeys: string[], confirm: () => void) => {
     confirm();
@@ -85,6 +92,48 @@ export const TaskManager: React.FC = () => {
         .includes((value as string).toLowerCase()),
   });
 
+  const handleAddClick = () => {
+    setEditingTask(null);
+    form.resetFields();
+    setIsModalOpen(true);
+  };
+
+  const handleEditClick = (record: TaskType) => {
+    setEditingTask(record);
+    form.setFieldsValue({
+      name: record.name,
+      content: record.content,
+      description: record.description
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleModalOk = () => {
+    form.validateFields().then(values => {
+      if (editingTask) {
+        const updatedTasks = tasks.map(t => 
+          t.id === editingTask.id ? { ...t, ...values } : t
+        );
+        setTasks(updatedTasks);
+        message.success('Đã cập nhật tác vụ thành công');
+      } else {
+        const newTask: TaskType = {
+          id: `task-${Date.now()}`,
+          ...values
+        };
+        setTasks([newTask, ...tasks]);
+        message.success('Đã thêm tác vụ mới');
+      }
+      setIsModalOpen(false);
+      setEditingTask(null);
+    });
+  };
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+    setEditingTask(null);
+  };
+
   const columns = [
     {
       title: 'Tên tác vụ',
@@ -105,18 +154,19 @@ export const TaskManager: React.FC = () => {
       title: 'Mô tả thao tác',
       dataIndex: 'description',
       key: 'description',
+      render: (text: string) => <div className="whitespace-pre-wrap text-sm">{text}</div>
     },
     {
       title: 'Actions',
       key: 'actions',
       width: 80,
       align: 'center' as const,
-      render: () => (
+      render: (_: any, record: TaskType) => (
         <Button
           type="link"
           icon={<EditOutlined />}
           style={{ color: '#2db7f5' }}
-          onClick={() => alert('Tính năng sửa tác vụ đang phát triển')}
+          onClick={() => handleEditClick(record)}
         />
       )
     }
@@ -126,33 +176,79 @@ export const TaskManager: React.FC = () => {
     <div className="flex flex-col h-screen">
       {/* Header */}
       <div className="p-6 bg-white shrink-0" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold m-0" style={{ color: '#001529' }}>
-            Quản lý tác vụ
-          </h1>
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />}
-            style={{ background: '#2db7f5', borderColor: '#2db7f5' }}
-            onClick={() => alert('Tính năng thêm tác vụ đang phát triển')}
-          >
-            Thêm tác vụ
-          </Button>
-        </div>
+        <h1 className="text-2xl font-bold m-0" style={{ color: '#001529' }}>
+          Quản lý tác vụ
+        </h1>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6" style={{ background: '#eff0f9' }}>
-        <div className="bg-white rounded shadow-sm" style={{ border: '1px solid #f0f0f0' }}>
-          <Table
-            columns={columns}
-            dataSource={tasks}
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-            bordered
-          />
+        <div>
+          {/* Section Header */}
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-base font-bold m-0" style={{ color: '#001529' }}>
+              Thông tin tác vụ
+            </h2>
+            <Button 
+              type="dashed" 
+              size="small" 
+              icon={<EditOutlined />}
+              onClick={handleAddClick}
+            >
+              Thêm tác vụ
+            </Button>
+          </div>
+
+          <div className="bg-white rounded shadow-sm" style={{ border: '1px solid #f0f0f0' }}>
+            <Table
+              columns={columns}
+              dataSource={tasks}
+              rowKey="id"
+              pagination={{ pageSize: 10 }}
+              bordered
+            />
+          </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      <Modal
+        title={editingTask ? "Sửa tác vụ" : "Thêm tác vụ mới"}
+        open={isModalOpen}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Lưu lại"
+        cancelText="Hủy"
+        destroyOnClose
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          className="mt-4"
+        >
+          <Form.Item
+            name="name"
+            label="Tên tác vụ"
+            rules={[{ required: true, message: 'Vui lòng nhập tên tác vụ' }]}
+          >
+            <Input placeholder="Nhập tên tác vụ" />
+          </Form.Item>
+          <Form.Item
+            name="content"
+            label="Nội dung tác vụ"
+            rules={[{ required: true, message: 'Vui lòng nhập nội dung tác vụ' }]}
+          >
+            <TextArea rows={2} placeholder="Nhập nội dung chi tiết" />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Mô tả thao tác"
+            rules={[{ required: true, message: 'Vui lòng nhập mô tả thao tác' }]}
+          >
+            <TextArea rows={3} placeholder="Mô tả các bước thực hiện thao tác này" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
