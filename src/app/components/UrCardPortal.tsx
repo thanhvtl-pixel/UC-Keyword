@@ -14,7 +14,8 @@ import {
   SettingOutlined,
   DatabaseOutlined,
   TagsOutlined,
-  UnorderedListOutlined
+  UnorderedListOutlined,
+  AppstoreOutlined
 } from '@ant-design/icons';
 import { CaliloFieldManager } from './CaliloFieldManager';
 import { TaskManager } from './TaskManager';
@@ -88,6 +89,7 @@ export const UrCardPortal: React.FC = () => {
       children: [
         {
           key: 'calilo-fields',
+          icon: <AppstoreOutlined />,
           label: 'Quản lý field Calilo',
         },
         {

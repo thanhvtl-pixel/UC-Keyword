@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, Input, Space, Modal, Form, message } from 'antd';
+import { Table, Button, Input, Space, Modal, Form, message, Tag, Switch } from 'antd';
 import { SearchOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { InputRef } from 'antd';
 
@@ -11,6 +11,7 @@ interface TaskType {
   content: string;
   description: string;
   prompt: string;
+  isActive: boolean;
 }
 
 // Mock data
@@ -20,21 +21,24 @@ const initialTasks: TaskType[] = [
     name: 'Kiểm tra tồn kho',
     content: 'Check số lượng e-voucher trên hệ thống kho',
     description: 'Thao tác gọi API /inventory/check hoặc xem trên dashboard kho.',
-    prompt: 'Bạn là trợ lý ảo hỗ trợ kiểm tra tồn kho. Khi nhận yêu cầu kiểm tra số lượng voucher, hãy hỏi rõ Tên Chương trình và Mã doanh nghiệp.'
+    prompt: 'Bạn là trợ lý ảo hỗ trợ kiểm tra tồn kho. Khi nhận yêu cầu kiểm tra số lượng voucher, hãy hỏi rõ Tên Chương trình và Mã doanh nghiệp.',
+    isActive: true
   },
   {
     id: '2',
     name: 'Gửi Email báo giá',
     content: 'Gửi email báo giá cho khách hàng doanh nghiệp',
     description: 'Nhấn nút "Gửi Email", chọn template Báo Giá B2B, đính kèm file PDF.',
-    prompt: 'Hãy tạo mẫu email báo giá chuyên nghiệp B2B. Yêu cầu có đầy đủ thông tin: Lời chào, Bảng giá đính kèm, Chính sách chiết khấu, và Thông tin liên hệ.'
+    prompt: 'Hãy tạo mẫu email báo giá chuyên nghiệp B2B. Yêu cầu có đầy đủ thông tin: Lời chào, Bảng giá đính kèm, Chính sách chiết khấu, và Thông tin liên hệ.',
+    isActive: true
   },
   {
     id: '3',
     name: 'Hủy giao dịch',
     content: 'Hủy đơn hàng nếu khách hàng yêu cầu refund',
     description: 'Vào chi tiết đơn hàng -> Actions -> Hủy giao dịch -> Nhập lý do -> Xác nhận.',
-    prompt: 'Trước khi hủy giao dịch, hãy yêu cầu người dùng xác nhận lý do hủy và đảm bảo trạng thái đơn hàng là chưa sử dụng.'
+    prompt: 'Trước khi hủy giao dịch, hãy yêu cầu người dùng xác nhận lý do hủy và đảm bảo trạng thái đơn hàng là chưa sử dụng.',
+    isActive: false
   }
 ];
 
@@ -99,6 +103,7 @@ export const TaskManager: React.FC = () => {
   const handleAddClick = () => {
     setEditingTask(null);
     form.resetFields();
+    form.setFieldsValue({ isActive: true }); // Default to active when adding
     setIsModalOpen(true);
   };
 
@@ -108,7 +113,8 @@ export const TaskManager: React.FC = () => {
       name: record.name,
       content: record.content,
       description: record.description,
-      prompt: record.prompt
+      prompt: record.prompt,
+      isActive: record.isActive
     });
     setIsModalOpen(true);
   };
@@ -168,6 +174,26 @@ export const TaskManager: React.FC = () => {
       key: 'prompt',
       width: 300,
       render: (text: string) => <div className="whitespace-pre-wrap text-sm italic text-slate-600">{text}</div>
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      width: 100,
+      align: 'center' as const,
+      filters: [
+        { text: 'Active', value: true },
+        { text: 'Inactive', value: false },
+      ],
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? '#2db7f5' : undefined }} />
+      ),
+      onFilter: (value: any, record: TaskType) => record.isActive === value,
+      render: (isActive: boolean) => (
+        <Tag color={isActive ? 'green' : 'default'}>
+          {isActive ? 'Active' : 'Inactive'}
+        </Tag>
+      )
     },
     {
       title: 'Actions',
@@ -266,6 +292,13 @@ export const TaskManager: React.FC = () => {
             rules={[{ required: true, message: 'Vui lòng nhập Prompt AI để hướng dẫn bot' }]}
           >
             <TextArea rows={3} placeholder="Ví dụ: Bạn là trợ lý ảo hỗ trợ... Khi nhận yêu cầu, hãy..." />
+          </Form.Item>
+          <Form.Item
+            name="isActive"
+            label="Trạng thái hoạt động"
+            valuePropName="checked"
+          >
+            <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
           </Form.Item>
         </Form>
       </Modal>
