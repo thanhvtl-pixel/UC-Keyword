@@ -13,9 +13,11 @@ import {
   BarChartOutlined,
   SettingOutlined,
   DatabaseOutlined,
-  TagsOutlined
+  TagsOutlined,
+  UnorderedListOutlined
 } from '@ant-design/icons';
 import { CaliloFieldManager } from './CaliloFieldManager';
+import { TaskManager } from './TaskManager';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 const { Sider, Content } = Layout;
@@ -87,6 +89,11 @@ export const UrCardPortal: React.FC = () => {
         {
           key: 'calilo-fields',
           label: 'Quản lý field Calilo',
+        },
+        {
+          key: 'task-manager',
+          icon: <UnorderedListOutlined />,
+          label: 'Quản lý tác vụ',
         }
       ]
     },
@@ -101,6 +108,8 @@ export const UrCardPortal: React.FC = () => {
     switch (selectedMenu) {
       case 'calilo-fields':
         return <CaliloFieldManager />;
+      case 'task-manager':
+        return <TaskManager />;
       default:
         return (
           <div className="flex items-center justify-center h-full">
