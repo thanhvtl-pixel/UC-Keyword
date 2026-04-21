@@ -80,9 +80,15 @@ export const UrCardPortal: React.FC = () => {
       label: 'Quản lý báo cáo',
     },
     {
-      key: 'calilo-fields',
+      key: 'calilo-platform',
       icon: <DatabaseOutlined />,
-      label: 'Quản lý field Calilo',
+      label: 'Calilo platform',
+      children: [
+        {
+          key: 'calilo-fields',
+          label: 'Quản lý field Calilo',
+        }
+      ]
     },
     {
       key: 'urhost',
@@ -131,6 +137,7 @@ export const UrCardPortal: React.FC = () => {
         <Menu
           mode="inline"
           selectedKeys={[selectedMenu]}
+          defaultOpenKeys={['calilo-platform']}
           onClick={({ key }) => setSelectedMenu(key)}
           items={menuItems}
           style={{
