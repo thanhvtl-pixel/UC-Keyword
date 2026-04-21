@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AI Keyword Config – UrCard Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f4f6f9;--white:#fff;--border:#e2e8f0;--border2:#d1dce8;
+  --blue:#1677ff;--blue-light:#e8f0fe;--blue-mid:#bfd4fe;
+  --text:#1a2332;--text2:#4a5568;--text3:#94a3b8;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-bd:#bbf7d0;
+  --amber:#b45309;--amber-bg:#fffbeb;--amber-bd:#fde68a;
+  --red:#dc2626;--red-bg:#fef2f2;--red-bd:#fecaca;
+  --gray-bg:#f8fafc;--tag-bg:#dbeafe;--tag-text:#1e40af;--tag-bd:#93c5fd;
+  --radius:8px;--radius-sm:5px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+
+/* ── Layout ── */
+.app{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#0f1c2e;padding:0 24px;height:52px;display:flex;align-items:center;gap:20px;flex-shrink:0;position:sticky;top:0;z-index:100}
+.topbar-logo{color:#fff;font-weight:700;font-size:16px;letter-spacing:.3px}
+.topbar-logo span{color:#4da6ff}
+.topbar-nav{display:flex;gap:2px;margin-left:12px}
+.tnav{color:rgba(255,255,255,.55);font-size:13px;padding:6px 12px;border-radius:6px;cursor:pointer;transition:.15s}
+.tnav:hover{color:#fff;background:rgba(255,255,255,.08)}
+.tnav.act{color:#fff;background:rgba(255,255,255,.12)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.avatar{width:30px;height:30px;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600}
+
+.main{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:24px 20px}
+
+/* ── Page header ── */
+.page-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px}
+.page-title{font-size:20px;font-weight:700;color:var(--text)}
+.page-sub{font-size:13px;color:var(--text3);margin-top:2px}
+.hd-actions{display:flex;gap:8px;flex-shrink:0}
+
+/* ── Type switcher ── */
+.type-bar{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;background:var(--white)}
+.type-btn{flex:1;padding:11px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;font-family:'Be Vietnam Pro',sans-serif;color:var(--text2);transition:.15s;border-right:1px solid var(--border)}
+.type-btn:last-child{border-right:none}
+.type-btn:hover{background:var(--gray-bg)}
+.type-btn.act{background:var(--blue);color:#fff}
+.type-btn.act .tbadge{background:rgba(255,255,255,.25);color:#fff}
+.tbadge{display:inline-block;margin-left:6px;background:var(--blue-light);color:var(--blue);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:600}
+
+/* ── Progress summary ── */
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.sum-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+.sum-num{font-size:22px;font-weight:700;line-height:1}
+.sum-lbl{font-size:11px;color:var(--text3);margin-top:3px}
+.sum-card.c-blue .sum-num{color:var(--blue)}
+.sum-card.c-green .sum-num{color:var(--green)}
+.sum-card.c-amber .sum-num{color:var(--amber)}
+.sum-card.c-red .sum-num{color:var(--red)}
+
+/* ── Section header (THÔNG TIN KH / THÔNG TIN TICKET) ── */
+.section-hd{background:linear-gradient(90deg,#0f1c2e 0%,#1e3a5f 100%);color:#fff;padding:9px 16px;border-radius:var(--radius) var(--radius) 0 0;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-top:16px}
+
+/* ── Field card ── */
+.field-card{background:var(--white);border:1px solid var(--border);border-top:none;margin-bottom:0}
+.field-card:last-child{border-radius:0 0 var(--radius) var(--radius)}
+.field-card+.section-hd{margin-top:20px}
+
+.field-head{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:.15s}
+.field-head:hover{background:var(--gray-bg)}
+.field-head.open{border-bottom-color:var(--border)}
+.fh-arrow{font-size:10px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.fh-arrow.open{transform:rotate(90deg)}
+.fh-num{font-size:11px;color:var(--text3);font-weight:600;min-width:18px}
+.fh-name{font-size:13px;font-weight:600;color:var(--text);flex:1}
+.fh-badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;flex-shrink:0}
+.badge-req{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
+.badge-opt{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
+.fh-meta{font-size:11px;color:var(--text3);flex-shrink:0}
+.fh-status{font-size:11px;padding:2px 8px;border-radius:10px;flex-shrink:0}
+.fh-status.done{background:var(--green-bg);color:var(--green)}
+.fh-status.partial{background:var(--amber-bg);color:var(--amber)}
+.fh-status.empty{background:var(--red-bg);color:var(--red)}
+.fh-status.skip{background:#f1f5f9;color:var(--text3)}
+
+/* ── Field body ── */
+.field-body{display:none}
+.field-body.open{display:block}
+
+/* No-keyword notice */
+.no-kw-notice{padding:12px 16px;background:#f8fafc;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;color:var(--text3);font-size:12px;font-style:italic}
+.no-kw-notice svg{flex-shrink:0;opacity:.5}
+
+/* Table grid header */
+.grid-hd{display:grid;grid-template-columns:200px 1fr 1fr;gap:0;background:#f0f5ff;padding:7px 16px;border-bottom:1px solid var(--border);border-top:1px solid var(--border)}
+.grid-hd span{font-size:11px;color:#3b5bdb;font-weight:600}
+
+/* Option rows */
+.opt-row{display:grid;grid-template-columns:200px 1fr 1fr;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:start;transition:.1s}
+.opt-row:last-child{border-bottom:none}
+.opt-row:nth-child(even){background:#fafbfd}
+.opt-row:hover{background:#f5f8ff}
+.opt-val{font-size:12px;font-weight:600;color:var(--text);padding-top:5px;line-height:1.4;word-break:break-word}
+
+/* Tag input */
+.tag-wrap{border:1px solid var(--border2);border-radius:var(--radius-sm);min-height:34px;padding:4px 7px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;background:var(--white);cursor:text;transition:.15s}
+.tag-wrap:hover{border-color:#93c5fd}
+.tag-wrap:focus-within{border-color:var(--blue);box-shadow:0 0 0 2px rgba(22,119,255,.15)}
+.tag{background:var(--tag-bg);color:var(--tag-text);border:1px solid var(--tag-bd);border-radius:4px;padding:1px 6px;font-size:11px;display:inline-flex;align-items:center;gap:3px;line-height:1.7;font-family:'Be Vietnam Pro',sans-serif}
+.tag-x{cursor:pointer;opacity:.5;font-size:10px;line-height:1;transition:.1s}
+.tag-x:hover{opacity:1;color:var(--red)}
+.tag-inp{border:none;outline:none;font-size:12px;min-width:60px;flex:1;color:var(--text);font-family:'Be Vietnam Pro',sans-serif;background:transparent;padding:1px 0}
+.tag-inp::placeholder{color:var(--text3)}
+
+/* Textarea */
+.ex-area{width:100%;border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 9px;font-size:12px;font-family:'Be Vietnam Pro',sans-serif;color:var(--text);resize:vertical;min-height:52px;line-height:1.5;transition:.15s;background:var(--white)}
+.ex-area:hover{border-color:#93c5fd}
+.ex-area:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(22,119,255,.15)}
+.ex-area::placeholder{color:var(--text3);font-style:italic}
+
+/* Big section with many options — collapse extra */
+.show-more-row{padding:8px 16px;border-top:1px solid var(--border);cursor:pointer;color:var(--blue);font-size:12px;font-weight:500;background:var(--blue-light);display:flex;align-items:center;gap:5px;transition:.15s}
+.show-more-row:hover{background:var(--blue-mid)}
+
+/* ── Sticky footer ── */
+.sticky-footer{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;z-index:50;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.footer-hint{font-size:12px;color:var(--text3)}
+.footer-hint b{color:var(--text2)}
+.btn{padding:8px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;transition:.15s;border:none}
+.btn-ghost{background:var(--white);color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--gray-bg);border-color:var(--border)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#0958d9}
+.btn-export{background:#059669;color:#fff}
+.btn-export:hover{background:#047857}
+
+/* Scrollable when many options */
+.field-body.scrollcap{max-height:420px;overflow-y:auto}
+.field-body.scrollcap::-webkit-scrollbar{width:4px}
+.field-body.scrollcap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* Helper tags for sample */
+.sample-hint{font-size:10px;color:var(--text3);font-style:italic;padding:2px 0;display:block}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2332;color:#fff;padding:10px 20px;border-radius:var(--radius);font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-logo">Ur<span>Card</span> Portal</div>
+  <div class="topbar-nav">
+    <div class="tnav">Dashboard</div>
+    <div class="tnav">Campaigns</div>
+    <div class="tnav act">AI Config</div>
+    <div class="tnav">Reports</div>
+  </div>
+  <div class="topbar-right">
+    <div style="font-size:12px;color:rgba(255,255,255,.5)">nguyen.thi.lan@urbox.vn</div>
+    <div class="avatar">NL</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Page header -->
+  <div class="page-hd">
+    <div>
+      <div class="page-title">AI Keyword Configuration</div>
+      <div class="page-sub">Điền keyword & ví dụ câu nói để AI nhận diện đúng từng field trong transcript cuộc gọi</div>
+    </div>
+    <div class="hd-actions">
+      <button class="btn btn-ghost" onclick="expandAll()">Mở tất cả</button>
+      <button class="btn btn-export" onclick="doExport()">⬇ Xuất Excel</button>
+      <button class="btn btn-primary" onclick="doSave()">💾 Lưu</button>
+    </div>
+  </div>
+
+  <!-- Type switcher -->
+  <div class="type-bar">
+    <button class="type-btn act" onclick="switchType('ps',this)">
+      CS Premium Service (CS PS) <span class="tbadge">16 fields</span>
+    </button>
+    <button class="type-btn" onclick="switchType('eg',this)">
+      CS eGift / OCR <span class="tbadge">21 fields</span>
+    </button>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="summary-row">
+    <div class="sum-card c-blue"><div class="sum-num" id="s-total">16</div><div class="sum-lbl">Tổng fields</div></div>
+    <div class="sum-card c-green"><div class="sum-num" id="s-done">0</div><div class="sum-lbl">Đã có keyword</div></div>
+    <div class="sum-card c-amber"><div class="sum-num" id="s-need">12</div><div class="sum-lbl">Cần điền</div></div>
+    <div class="sum-card"><div class="sum-num" id="s-skip" style="color:var(--text3)">4</div><div class="sum-lbl">Không cần keyword</div></div>
+  </div>
+
+  <!-- FORM CONTENT -->
+  <div id="form-ps"><!-- CS PS fields injected by JS --></div>
+  <div id="form-eg" style="display:none"><!-- CS EGIFT fields injected by JS --></div>
+
+</div><!-- /main -->
+
+<!-- Sticky footer -->
+<div class="sticky-footer">
+  <div class="footer-hint">💡 Gõ keyword rồi nhấn <b>Enter</b> để thêm · Nhấn <b>×</b> để xóa · Tự động lưu sau 30 giây</div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-ghost" onclick="doReset()">Đặt lại</button>
+    <button class="btn btn-export" onclick="doExport()">⬇ Xuất Excel</button>
+    <button class="btn btn-primary" onclick="doSave()">💾 Lưu cấu hình</button>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA – parsed from Excel sheets
+// ═══════════════════════════════════════════════
+const SKIP = 'KHÔNG CẦN';
+
+const PS_DATA = [
+  { section: 'THÔNG TIN KHÁCH HÀNG' },
+  { id:'ps-1', num:1, name:'Họ và tên', req:true, skip:true },
+  { id:'ps-2', num:2, name:'SĐT', req:true, skip:true },
+  { id:'ps-3', num:3, name:'Đối tượng Khách hàng', req:true, options:[
+    { val:'Khách hàng Premium', kw:'[Mẫu] premium, vip, cao cấp, ưu tiên, đặc quyền, thành viên cao cấp, hạng vàng, hạng platinum', ex:'"Anh là khách hàng VIP của ngân hàng"\n"Tôi có thẻ Platinum"\n"Em thuộc gói Premium"' },
+    { val:'Nội bộ UrBox', kw:'[Mẫu] nhân viên urbox, nội bộ, staff, team urbox, anh/chị trong công ty', ex:'"Em là nhân viên UrBox"\n"Anh gọi cho nội bộ"\n"Tôi thuộc team CS UrBox"' },
+  ]},
+  { id:'ps-4', num:4, name:'Doanh nghiệp', req:true, options:[
+    { val:'ACB' },{ val:'VPBank' },{ val:'OCB' },{ val:'TCB' },{ val:'JCB' },
+    { val:'SHB' },{ val:'Agribank' },{ val:'Prudential' },{ val:'Vietinbank' },{ val:'PVComBank' },
+  ]},
+  { id:'ps-5', num:5, name:'Chương trình', req:true, options:[
+    { val:'ACB Vị thời gian 2025' },{ val:'ACB Visa Infinite' },{ val:'ACB Loyalty' },
+    { val:'APP UrBox' },{ val:'Agribank' },{ val:'OCB Đặc quyền kim cương' },
+    { val:'JCB Premium Service' },{ val:'TCB Golf' },{ val:'TCB Rewards' },
+    { val:'VPBank Phong vị thượng lưu 2025' },{ val:'VPBank LINKID' },{ val:'VPBank Concierge' },
+    { val:'Standard Chartered 2025' },{ val:'Taekus' },{ val:'Visa UrPoint' },
+  ]},
+  { section: 'THÔNG TIN TICKET CALLIO' },
+  { id:'ps-6', num:6, name:'Nội dung chi tiết', req:true, skip:true },
+  { id:'ps-7', num:7, name:'Chương trình, dự án', req:true, options:[
+    { val:'ACB Vị thời gian 2025', kw:'[Mẫu] resort, villa, khách sạn, check-in, check-out, phòng, đặt phòng, nghỉ ngơi, staycation, retreat, night, đêm, hotel', ex:'"Em muốn đặt phòng khách sạn"\n"Anh muốn book villa cho cuối tuần"\n"Chị cần check-in resort ngày mai"\n"Tôi muốn đặt 2 đêm ở đây"' },
+    { val:'ACB Visa Infinite', kw:'[Mẫu] nhà hàng, ăn uống, buffet, set menu, bàn ăn, đặt bàn, dinner, lunch, brunch, fine dining, voucher ăn', ex:'"Em muốn đặt bàn nhà hàng tối nay"\n"Anh cần voucher buffet cho 4 người"\n"Chị ơi có set menu không?"' },
+    { val:'ACB Loyalty' },{ val:'APP UrBox' },{ val:'Agribank' },
+    { val:'OCB Đặc quyền kim cương' },{ val:'JCB Premium Service' },
+    { val:'TCB Golf' },{ val:'TCB Rewards' },
+    { val:'VPBank Phong vị thượng lưu 2025' },{ val:'VPBank LINKID' },{ val:'VPBank Concierge' },
+    { val:'Standard Chartered 2025', kw:'[Mẫu] spa, massage, thư giãn, chăm sóc da, facial, body treatment, liệu trình, beauty, wellness', ex:'"Tôi muốn đặt spa cho 2 người"\n"Anh muốn book gói massage"' },
+    { val:'Taekus' },{ val:'Visa UrPoint' },
+  ]},
+  { id:'ps-8', num:8, name:'Loại dịch vụ', req:true, options:[
+    { val:'Golf', kw:'[Mẫu] golf, sân golf, tee time, caddie, gậy, green fee, golf course, 9 lỗ, 18 lỗ', ex:'"Anh muốn đặt tee time sáng mai"\n"Tôi cần book sân golf cho 3 người"\n"Chị ơi còn slot golf cuối tuần không?"' },
+    { val:'Workshop', kw:'[Mẫu] workshop, lớp học, khóa học, lớp nấu ăn, cooking class, class, hội thảo, event', ex:'"Em muốn đăng ký workshop"\n"Anh cần đặt chỗ lớp học nấu ăn"' },
+    { val:'Fast Track', kw:'[Mẫu] fast track, ưu tiên làm thủ tục, sân bay, check-in nhanh, priority, thủ tục nhanh', ex:'"Anh muốn dùng fast track sân bay"\n"Tôi cần làm thủ tục nhanh"' },
+    { val:'Phòng chờ', kw:'[Mẫu] phòng chờ, lounge, sân bay, VIP lounge, tiếp cận phòng chờ', ex:'"Tôi muốn vào phòng chờ sân bay"\n"Anh cần dùng lounge Nội Bài"' },
+    { val:'Vé vui chơi', kw:'[Mẫu] vé, công viên, vui chơi, theme park, giải trí, ticket, show, concert, sự kiện', ex:'"Em muốn mua vé công viên nước"\n"Anh cần vé vui chơi cho 2 bé"' },
+    { val:'Tour', kw:'[Mẫu] tour, du lịch, đi chơi, chuyến đi, travel, trip, hành trình, lịch trình, tham quan', ex:'"Anh muốn đặt tour Đà Lạt"\n"Em cần book tour 3 ngày 2 đêm"' },
+    { val:'Giáo dục', kw:'[Mẫu] học, khóa học, giáo dục, trường, học phí, tiếng Anh, kỹ năng, certification, education', ex:'"Tôi muốn đổi voucher học tiếng Anh"\n"Em đăng ký khóa học lập trình"' },
+    { val:'Bảo hiểm', kw:'[Mẫu] bảo hiểm, insurance, bảo vệ, quyền lợi bảo hiểm, bồi thường, hợp đồng bảo hiểm', ex:'"Tôi muốn biết quyền lợi bảo hiểm"\n"Anh cần tư vấn gói bảo hiểm"' },
+    { val:'Nghỉ dưỡng' },{ val:'Ẩm thực' },{ val:'Spa' },{ val:'Sức khỏe' },
+    { val:'Vé thưởng Taekus' },{ val:'3D Golf' },{ val:'Đồ uống (ACB Everyday)' },
+  ]},
+  { id:'ps-9', num:9, name:'Nội dung cuộc gọi', req:true, options:[
+    { val:'Call in: Tư vấn, hướng dẫn sử dụng', kw:'[Mẫu] hỏi, cách dùng, hướng dẫn, không biết cách, làm thế nào, tư vấn, giải thích, thắc mắc, hỏi thăm', ex:'"Em không biết cách dùng voucher"\n"Anh ơi hướng dẫn giùm em"\n"Tôi muốn hỏi về cách sử dụng"' },
+    { val:'Call in: Tiếp nhận yêu cầu đặt dịch vụ', kw:'[Mẫu] muốn đặt, book, đặt chỗ, đặt lịch, đặt phòng, đặt bàn, đặt tour, booking, yêu cầu đặt', ex:'"Tôi muốn đặt dịch vụ"\n"Anh cần book gói spa"\n"Em muốn đặt phòng khách sạn"' },
+    { val:'Call in: Tiếp nhận yêu cầu thay đổi dịch vụ', kw:'[Mẫu] thay đổi, đổi lịch, dời lịch, reschedule, sửa thông tin, cập nhật, điều chỉnh', ex:'"Anh muốn đổi ngày check-in"\n"Em cần thay đổi số người"' },
+    { val:'Call in: Tiếp nhận yêu cầu hủy dịch vụ', kw:'[Mẫu] hủy, cancel, không đi nữa, bỏ đặt, refund, hoàn tiền, hủy booking', ex:'"Tôi muốn hủy đặt phòng"\n"Anh cần cancel tour"' },
+    { val:'Call in: Tư vấn và xử lý khiếu nại/Complaint', kw:'[Mẫu] khiếu nại, phàn nàn, không hài lòng, sai, lỗi, không nhận được, bị lừa, không đúng, complaint, vấn đề', ex:'"Tôi phàn nàn về dịch vụ"\n"Voucher của tôi không dùng được"\n"Anh bị trừ tiền mà không nhận được"' },
+    { val:'Call out: Xác nhận thông tin đặt dịch vụ', kw:'[Mẫu] xác nhận, confirm, gọi lại xác nhận, kiểm tra thông tin đặt', ex:'"Em gọi để xác nhận booking của anh"\n"Chị ơi tôi gọi confirm lịch spa"' },
+    { val:'Call out: Phản hồi kết quả', kw:'[Mẫu] kết quả, update, phản hồi, báo kết quả, thông báo, resolved', ex:'"Em gọi để báo kết quả xử lý"\n"Anh ơi ticket của chị đã được xử lý rồi"' },
+    { val:'Call out: Kiểm tra khả năng đáp ứng với MC' },
+    { val:'Call out: Survey' },
+    { val:'Call out: Tư vấn, hỗ trợ thông tin' },
+  ]},
+  { id:'ps-10', num:10, name:'Mã PSUB', req:true, skip:true },
+  { id:'ps-11', num:11, name:'Độ ưu tiên', req:true, options:[
+    { val:'Khẩn cấp (04 giờ)', kw:'[Mẫu] gấp, ngay bây giờ, khẩn, cần ngay, hôm nay, vài tiếng nữa, sắp dùng, sắp sử dụng, cấp bách', ex:'"Anh cần dùng chiều nay rồi"\n"Chị ơi 3 tiếng nữa em check-in"\n"Gấp lắm, tôi cần ngay"' },
+    { val:'Cao (24 giờ)', kw:'[Mẫu] khiếu nại, complaint, phàn nàn, cần sớm, cần trong ngày, hôm nay hoặc ngày mai, bức xúc', ex:'"Tôi muốn khiếu nại"\n"Anh rất bức xúc về vấn đề này"\n"Chị giải quyết giúm tôi trong hôm nay"' },
+    { val:'Bình thường (24–48 giờ)', kw:'[Mẫu] thông thường, không gấp, tuần sau, tư vấn, hỏi thông tin, khi nào rảnh', ex:'"Em chỉ hỏi thông tin thôi"\n"Anh muốn tư vấn thêm"\n"Không gấp, khi nào được thì báo em"' },
+  ]},
+  { id:'ps-12', num:12, name:'SLA', req:true, options:[
+    { val:'04 giờ' },{ val:'24 giờ' },{ val:'24 giờ ~ 48 giờ' },{ val:'> 48 giờ' },
+  ]},
+  { id:'ps-13', num:13, name:'Kênh sử dụng', req:true, options:[
+    { val:'UrBox App', kw:'[Mẫu] app, ứng dụng, điện thoại, urbox app, mở app, tải app, đăng nhập app', ex:'"Em đổi voucher trên app"\n"Anh dùng qua ứng dụng UrBox"\n"Tôi mở app lên mà không thấy"' },
+    { val:'Phiếu quà tặng', kw:'[Mẫu] phiếu, giấy, voucher giấy, phiếu quà, coupon giấy', ex:'"Anh có phiếu quà tặng giấy"\n"Chị ơi em cầm tờ phiếu này"' },
+    { val:'Thẻ/link quà tặng', kw:'[Mẫu] link, thẻ quà, đường link, link quà tặng, thẻ điện tử, url, nhấn vào link', ex:'"Em nhận được link quà tặng"\n"Anh bấm vào link nhưng không dùng được"' },
+    { val:'Loyalty', kw:'[Mẫu] loyalty, tích điểm, điểm thưởng, linkid, acb loyalty, tcb reward, đổi điểm', ex:'"Anh muốn đổi điểm loyalty"\n"Em dùng điểm tích lũy ACB"' },
+    { val:'Whitelabel', kw:'[Mẫu] ACB vị thời gian, vpbank phong vị, jcb premium, standard chartered, booking trực tiếp, whitelabel', ex:'"Anh dùng quyền lợi ACB Vị Thời Gian"\n"Em book qua chương trình VPBank Phong Vị"' },
+    { val:'Manual booking', kw:'[Mẫu] tổng đài, xác thực, tcb golf, vietinbank, ocb, manual, gọi để đặt, đặt qua tổng đài', ex:'"Anh muốn đặt golf TCB qua tổng đài"\n"Em gọi để đăng ký OCB Đặc quyền"' },
+  ]},
+  { id:'ps-14', num:14, name:'Nguyên nhân khiếu nại (nếu có)', req:false, skip:true },
+  { id:'ps-15', num:15, name:'Nguyên nhân phát sinh khiếu nại (nếu có)', req:false, skip:true },
+  { id:'ps-16', num:16, name:'Phương án xử lý khiếu nại (nếu có)', req:false, skip:true },
+];
+
+const EG_DATA = [
+  { section: 'THÔNG TIN KHÁCH HÀNG' },
+  { id:'eg-1', num:1, name:'Họ và tên', req:true, skip:true },
+  { id:'eg-2', num:2, name:'SĐT', req:true, skip:true },
+  { id:'eg-3', num:3, name:'Doanh nghiệp', req:true, options:[
+    { val:'Traveloka' },{ val:'Maison' },{ val:'Couple Tx' },{ val:'Routine' },{ val:'Hoàng Phúc' },
+    { val:'Vascara' },{ val:'Juno' },{ val:'PNJ' },{ val:'Canifa' },{ val:'Owen' },
+    { val:'Gogi House' },{ val:'Kichi Kichi' },{ val:'Manwah' },{ val:'Hutong' },{ val:'Sumo Yakiniku' },
+    { val:'Isushi' },{ val:'Ashima' },{ val:"Cowboy Jack's" },{ val:'Daruma' },{ val:'Shogun' },
+    { val:'Crystal Jade' },{ val:'Phố Ngon 37' },{ val:'K-Pub' },{ val:'GoGi Kitchen' },
+    { val:'The Pizza Company' },{ val:'Dairy Queen' },{ val:"Swensen's" },{ val:'AKA' },{ val:'Holy Crab' },
+  ]},
+  { section: 'THÔNG TIN TICKET CALLIO' },
+  { id:'eg-4', num:4, name:'Tên Ticket', req:true, skip:true },
+  { id:'eg-5', num:5, name:'Nguồn', req:false, skip:true },
+  { id:'eg-6', num:6, name:'SLA', req:true, options:[
+    { val:'Xử lý ngay trong call (FCR - 5 phút)' },
+    { val:'Xử lý trong vòng 60p (FCR < 60p)' },
+    { val:'01 ngày làm việc (24 giờ)' },
+    { val:'02 ngày làm việc (2 ngày)' },
+    { val:'03 ngày làm việc (3 ngày)' },
+    { val:'03 - 05 ngày làm việc' },
+    { val:'> 05 ngày làm việc (5 ngày)' },
+  ]},
+  { id:'eg-7', num:7, name:'Đối tượng khách hàng', req:true, options:[
+    { val:'KH cá nhân' },{ val:'Nhân viên đối tác' },{ val:'Khách hàng Premium' },
+    { val:'Nội bộ UrBox' },{ val:'KH được cho/tặng' },
+  ]},
+  { id:'eg-8', num:8, name:'Nhóm Nghiệp vụ', req:true, options:[
+    { val:'EGIFT' },{ val:'OCR' },
+  ]},
+  { id:'eg-9', num:9, name:'Chương trình', req:true, options:[
+    { val:'Chưa rõ' },{ val:'Chi tiêu Visa – Săn vé Starbucks Concert' },
+    { val:'Suntory Pepsico - Aquafina' },{ val:'OCR_Nivea' },{ val:'OCR_Panasonic' },
+    { val:'OCR_Shiseido' },{ val:'AIA - VpBank' },{ val:'AIA' },{ val:'AIA Vitality' },
+    { val:'ACB Loyalty' },{ val:'VpBank' },{ val:'LG' },{ val:'MBAL' },{ val:'Unilever' },
+    { val:'VNA Loyalty' },{ val:'Bảo Việt Loyalty' },{ val:'Manulife' },{ val:'PvComBank' },
+    { val:'OneID' },{ val:'Visa UrPoint' },{ val:'Phiếu quà tặng' },{ val:'Warrior' },
+    { val:'Castrol Loyalty' },{ val:'Prudential' },{ val:'Vietcombank' },{ val:'Eximbank' },
+    { val:'SeAbank' },{ val:'HanwhaLife' },{ val:'O2F' },{ val:'EverHR' },
+    { val:'Pepsi' },{ val:'MB Loyalty' },{ val:'Coca Cola' },{ val:'MSB' },
+    { val:'Masan' },{ val:'Shell' },{ val:'Fe Credit Banca' },{ val:'UrBox App' },
+    { val:'VIB Loyalty' },{ val:'VIB Whitelable' },
+    { val:'LG Campaign 82 (Giặt sấy)' },{ val:'LG Campaign 81 (TV)' },
+    { val:'LG Campaign 80 (Tivi)' },{ val:'LG Campaign 79 Tủ lạnh' },
+    { val:'LG Campaign 78 (Giặt,sấy T12/2025)' },{ val:'LG Campaign 77 (MRB)' },
+    { val:'LG Campaign 76 (Giặt sấy)' },{ val:'LG Campaign 75 (Tivi - T11/2025)' },
+    { val:'...và 300+ chương trình khác', readonly:true },
+  ]},
+  { id:'eg-10', num:10, name:'Kênh sử dụng', req:true, options:[
+    { val:'UrBox App' },{ val:'Loyalty' },{ val:'Whitelabel' },{ val:'Chương trình quay thưởng' },
+  ]},
+  { id:'eg-11', num:11, name:'Sản phẩm', req:true, options:[
+    { val:'E-voucher' },{ val:'Phiếu quà tặng' },{ val:'Thẻ/link quà tặng' },
+    { val:'Thẻ nạp điện thoại' },{ val:'Quà tặng hiện vật' },{ val:'Booking' },
+  ]},
+  { id:'eg-12', num:12, name:'Mã voucher', req:true, skip:true },
+  { id:'eg-13', num:13, name:'Thương hiệu', req:false, skip:true },
+  { id:'eg-14', num:14, name:'Địa chỉ cửa hàng', req:false, skip:true },
+  { id:'eg-15', num:15, name:'Email', req:false, skip:true },
+  { id:'eg-16', num:16, name:'Nhóm yêu cầu', req:true, options:[
+    { val:'Tư vấn/Hỗ trợ' },{ val:'Xử lý yêu cầu/Khiếu nại' },
+  ]},
+  { id:'eg-17', num:17, name:'Yêu cầu', req:true, options:[
+    { val:'Tư vấn chuyển Lead' },{ val:'Tư vấn thông tin sản phẩm' },
+    { val:'Kiểm tra thông tin voucher/thẻ/thẻ nạp/thẻ game/quà tặng' },
+    { val:'Hướng dẫn sử dụng sản phẩm/ CT quay thưởng' },
+    { val:'Hỗ trợ đăng ký nhận quà' },
+    { val:'Tiếp nhận và xử lý yêu cầu/Khiếu nại' },
+    { val:'Xác nhận đơn quà (QVL/LG)' },
+    { val:'Thông báo nhận QVL/KQ hỗ trợ' },
+    { val:'Liên hệ nhà mạng viễn thông' },
+    { val:'Liên hệ nội bộ UrBox' },
+    { val:'Khảo sát KH' },{ val:'Crosscheck' },{ val:'Nguyên tắc duyệt quà' },
+    { val:'Liên hệ miss call' },{ val:'Hỏi đáp yêu cầu/hỗ trợ trước' },
+    { val:'Tư vấn thông tin khác' },
+  ]},
+  { id:'eg-18', num:18, name:'Chi tiết yêu cầu (Nguyên nhân)', req:false, skip:true },
+  { id:'eg-19', num:19, name:'Vấn đề cụ thể', req:false, skip:true },
+  { id:'eg-20', num:20, name:'Nguyên nhân chi tiết (nếu có)', req:false, skip:true },
+  { id:'eg-21', num:21, name:'Phương án xử lý khiếu nại (nếu có)', req:false, skip:true },
+];
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const state = {}; // state[fieldId][optionVal] = { kw:[], ex:'' }
+
+function getState(fid, oval) {
+  if (!state[fid]) state[fid] = {};
+  if (!state[fid][oval]) state[fid][oval] = { kw: [], ex: '' };
+  return state[fid][oval];
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+const COLLAPSE_AFTER = 8; // show first N options, rest collapsed
+
+function buildForm(data, containerId) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  let currentSection = null;
+
+  data.forEach((item, idx) => {
+    if (item.section) {
+      const sd = document.createElement('div');
+      sd.className = 'section-hd';
+      sd.textContent = item.section;
+      c.appendChild(sd);
+      currentSection = sd;
+      return;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'field-card';
+
+    // ── Head ──
+    const head = document.createElement('div');
+    head.className = 'field-head';
+    head.innerHTML = `
+      <span class="fh-arrow">▶</span>
+      <span class="fh-num">${item.num}</span>
+      <span class="fh-name">${item.name}</span>
+      <span class="fh-badge ${item.req ? 'badge-req':'badge-opt'}">${item.req ? 'Bắt buộc':'Không bắt buộc'}</span>
+      ${item.skip ? '<span class="fh-meta">Không cần keyword</span>' : (item.options ? `<span class="fh-meta">${item.options.length} options</span>` : '')}
+      ${item.skip ? '<span class="fh-status skip">Tự động</span>' : '<span class="fh-status empty" id="status-'+item.id+'">Chưa điền</span>'}
+    `;
+
+    // ── Body ──
+    const body = document.createElement('div');
+    body.className = 'field-body';
+
+    if (item.skip) {
+      body.innerHTML = `<div class="no-kw-notice">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4m0 3v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Không cần keyword – AI tự nhận diện hoặc trích xuất trực tiếp từ transcript
+      </div>`;
+    } else if (item.options) {
+      const visible = item.options.slice(0, COLLAPSE_AFTER);
+      const hidden  = item.options.slice(COLLAPSE_AFTER);
+
+      body.innerHTML = `
+        <div class="grid-hd">
+          <span>Giá trị (Dropdown)</span>
+          <span>Keywords <small style="font-weight:400;opacity:.7">— gõ rồi nhấn Enter</small></span>
+          <span>Ví dụ câu nói thực tế</span>
+        </div>
+        <div class="opt-visible"></div>
+        ${hidden.length ? `
+          <div class="show-more-row" onclick="toggleMore(this)">
+            ▸ Hiện thêm ${hidden.length} options
+          </div>
+          <div class="opt-hidden" style="display:none"></div>
+        ` : ''}
+      `;
+
+      const visContainer = body.querySelector('.opt-visible');
+      visible.forEach(opt => visContainer.appendChild(buildOptRow(item.id, opt)));
+
+      if (hidden.length) {
+        const hidContainer = body.querySelector('.opt-hidden');
+        hidden.forEach(opt => hidContainer.appendChild(buildOptRow(item.id, opt)));
+      }
+    }
+
+    head.addEventListener('click', () => toggleField(head, body));
+    card.appendChild(head);
+    card.appendChild(body);
+    c.appendChild(card);
+  });
+}
+
+function buildOptRow(fid, opt) {
+  const row = document.createElement('div');
+  row.className = 'opt-row';
+
+  if (opt.readonly) {
+    row.innerHTML = `<div class="opt-val" style="color:var(--text3);font-style:italic;font-size:11px">${opt.val}</div><div></div><div></div>`;
+    return row;
+  }
+
+  // Parse sample kw
+  const initKws = (opt.kw || '').replace(/^\[Mẫu\]\s*/,'').split(',').map(s=>s.trim()).filter(s=>s && s!=='Nhờ CS input giúp em');
+  const initEx  = (opt.ex || '').replace(/^\[Mẫu\]\n?/,'').replace(/Nhờ CS input giúp em/g,'').trim();
+
+  // Pre-populate state with samples
+  const st = getState(fid, opt.val);
+  if (initKws.length && st.kw.length === 0) {
+    st.kw = [...initKws];
+  }
+  if (initEx && !st.ex) {
+    st.ex = initEx;
+  }
+
+  row.innerHTML = `
+    <div class="opt-val">${opt.val}</div>
+    <div>
+      <div class="tag-wrap" data-fid="${fid}" data-oval="${opt.val}"></div>
+    </div>
+    <div>
+      <textarea class="ex-area" data-fid="${fid}" data-oval="${opt.val}" placeholder='"VD: câu KH thường nói trong cuộc gọi..."' rows="2">${st.ex}</textarea>
+    </div>
+  `;
+
+  const tw = row.querySelector('.tag-wrap');
+  renderTags(tw, fid, opt.val);
+
+  // Textarea save
+  row.querySelector('.ex-area').addEventListener('input', function() {
+    getState(fid, opt.val).ex = this.value;
+    updateFieldStatus(fid);
+  });
+
+  // Tag input – click anywhere on wrap focuses the hidden input
+  tw.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('tag-x')) {
+      let inp = tw.querySelector('.tag-inp');
+      if (!inp) {
+        inp = makeTagInput(tw, fid, opt.val);
+        tw.appendChild(inp);
+      }
+      inp.focus();
+    }
+  });
+
+  return row;
+}
+
+function makeTagInput(tw, fid, oval) {
+  const inp = document.createElement('input');
+  inp.className = 'tag-inp';
+  inp.placeholder = 'Thêm keyword...';
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const v = inp.value.trim().replace(/,$/, '');
+      if (v) {
+        getState(fid, oval).kw.push(v);
+        inp.value = '';
+        renderTags(tw, fid, oval);
+        updateFieldStatus(fid);
+      }
+    }
+    if (e.key === 'Backspace' && !inp.value) {
+      const st = getState(fid, oval);
+      if (st.kw.length) { st.kw.pop(); renderTags(tw, fid, oval); updateFieldStatus(fid); }
+    }
+  });
+  inp.addEventListener('blur', () => {
+    const v = inp.value.trim();
+    if (v) { getState(fid, oval).kw.push(v); inp.value = ''; renderTags(tw, fid, oval); updateFieldStatus(fid); }
+  });
+  return inp;
+}
+
+function renderTags(tw, fid, oval) {
+  const st = getState(fid, oval);
+  const inp = tw.querySelector('.tag-inp');
+  tw.innerHTML = '';
+  st.kw.forEach((k, i) => {
+    const t = document.createElement('span');
+    t.className = 'tag';
+    t.innerHTML = `${k} <span class="tag-x" data-i="${i}">×</span>`;
+    t.querySelector('.tag-x').addEventListener('click', e => {
+      e.stopPropagation();
+      st.kw.splice(i, 1);
+      renderTags(tw, fid, oval);
+      updateFieldStatus(fid);
+    });
+    tw.appendChild(t);
+  });
+  const newInp = inp || makeTagInput(tw, fid, oval);
+  tw.appendChild(newInp);
+}
+
+function toggleField(head, body) {
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  head.classList.toggle('open', !isOpen);
+  head.querySelector('.fh-arrow').classList.toggle('open', !isOpen);
+}
+
+function toggleMore(btn) {
+  const hidden = btn.nextElementSibling;
+  const isHidden = hidden.style.display === 'none';
+  hidden.style.display = isHidden ? 'block' : 'none';
+  btn.textContent = isHidden ? '▾ Thu gọn' : '▸ Hiện thêm';
+}
+
+function updateFieldStatus(fid) {
+  const el = document.getElementById('status-' + fid);
+  if (!el) return;
+  const s = state[fid];
+  if (!s) return;
+  const vals = Object.values(s);
+  const filled = vals.filter(v => v.kw.length > 0 || v.ex.trim()).length;
+  const total  = vals.length;
+  if (filled === 0) { el.className = 'fh-status empty'; el.textContent = 'Chưa điền'; }
+  else if (filled < total) { el.className = 'fh-status partial'; el.textContent = `${filled}/${total} options`; }
+  else { el.className = 'fh-status done'; el.textContent = 'Đã điền đủ'; }
+  updateSummary();
+}
+
+function updateSummary() {
+  const curData = currentType === 'ps' ? PS_DATA : EG_DATA;
+  const fields = curData.filter(d => d.id && !d.skip && d.options);
+  let done = 0, need = fields.length;
+  const skips = curData.filter(d => d.id && d.skip).length;
+  fields.forEach(f => {
+    const s = state[f.id];
+    if (s && Object.values(s).some(v => v.kw.length > 0 || v.ex.trim())) done++;
+  });
+  const total = curData.filter(d => d.id).length;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-need').textContent = need - done;
+  document.getElementById('s-skip').textContent = skips;
+}
+
+// ═══════════════════════════════════════════════
+//  TYPE SWITCH
+// ═══════════════════════════════════════════════
+let currentType = 'ps';
+
+function switchType(type, btn) {
+  currentType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('act'));
+  btn.classList.add('act');
+  document.getElementById('form-ps').style.display = type === 'ps' ? '' : 'none';
+  document.getElementById('form-eg').style.display = type === 'eg' ? '' : 'none';
+  updateSummary();
+}
+
+// ═══════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════
+function expandAll() {
+  const id = currentType === 'ps' ? 'form-ps' : 'form-eg';
+  document.querySelectorAll(`#${id} .field-head`).forEach(h => {
+    const body = h.nextElementSibling;
+    h.classList.add('open');
+    h.querySelector('.fh-arrow').classList.add('open');
+    body.classList.add('open');
+  });
+}
+
+function doSave() {
+  showToast('✓ Đã lưu cấu hình thành công!');
+}
+
+function doReset() {
+  if (!confirm('Đặt lại tất cả keyword đã nhập?')) return;
+  Object.keys(state).forEach(k => delete state[k]);
+  buildForm(PS_DATA, 'form-ps');
+  buildForm(EG_DATA, 'form-eg');
+  updateSummary();
+  showToast('Đã đặt lại');
+}
+
+function doExport() {
+  // Build CSV for download
+  const curData = currentType === 'ps' ? PS_DATA : EG_DATA;
+  const label = currentType === 'ps' ? 'CS_PS' : 'CS_EGIFT';
+  let csv = 'Field,Giá trị,Keywords,Ví dụ câu nói\n';
+  curData.forEach(item => {
+    if (item.section || !item.id) return;
+    if (item.skip) {
+      csv += `"${item.name}","(Không cần keyword)","",""\n`;
+    } else if (item.options) {
+      item.options.forEach(opt => {
+        if (opt.readonly) return;
+        const st = getState(item.id, opt.val);
+        const kw = st.kw.join(', ');
+        const ex = st.ex.replace(/"/g, '""');
+        csv += `"${item.name}","${opt.val}","${kw}","${ex}"\n`;
+      });
+    }
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `AI_Keyword_Config_${label}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('⬇ Đang tải xuống file CSV...');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+buildForm(PS_DATA, 'form-ps');
+buildForm(EG_DATA, 'form-eg');
+updateSummary();
+</script>
+</body>
+</html>
