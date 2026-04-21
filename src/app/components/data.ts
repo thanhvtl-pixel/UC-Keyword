@@ -17,6 +17,7 @@ export interface FieldType {
   skip?: boolean;
   system?: boolean; // true for System fields, false/undefined for Custom fields
   options?: OptionType[];
+  type?: string;
 }
 
 // ============================================

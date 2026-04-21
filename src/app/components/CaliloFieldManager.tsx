@@ -137,6 +137,7 @@ export const CaliloFieldManager: React.FC = () => {
         name: values.label,
         section: activeSection,
         req: values.required,
+        type: values.type, // Lưu lại kiểu nhập liệu
         options: addedOptions.map(v => ({ val: v, syncStatus: 'pending' })), // Option mới mang trạng thái New
         system: false,
         syncStatus: 'pending'
@@ -330,28 +331,27 @@ export const CaliloFieldManager: React.FC = () => {
       )
     },
     {
-      title: 'Số options',
-      dataIndex: 'optionCount',
-      key: 'optionCount',
-      width: 110,
+      title: 'Kiểu nhập liệu',
+      dataIndex: 'type',
+      key: 'type',
+      width: 150,
       align: 'center' as const,
-      render: (count: number) => (
-        <span className={count === 0 ? "text-slate-400" : "font-semibold text-slate-900"}>
-          {count === 0 ? '-' : count}
-        </span>
-      )
-    },
-    {
-      title: 'Tổng keywords',
-      dataIndex: 'keywordCount',
-      key: 'keywordCount',
-      width: 120,
-      align: 'center' as const,
-      render: (count: number) => (
-        <span className={count === 0 ? "text-slate-400" : "font-semibold text-slate-900"}>
-          {count === 0 ? '-' : count}
-        </span>
-      )
+      render: (type: string, record: any) => {
+        const typeMap: Record<string, string> = {
+          'text': 'Nhập chữ',
+          'paragraph': 'Đoạn văn',
+          'number': 'Số',
+          'date': 'Thời gian',
+          'day': 'Ngày',
+          'one': 'Chọn một',
+          'multiple': 'Chọn nhiều',
+          'tags': 'Thẻ'
+        };
+        // Các field cũ trước đây: nếu có option -> Chọn một, nếu không có -> Nhập chữ
+        const fallbackType = record.optionCount > 0 ? 'one' : 'text';
+        const label = typeMap[type || fallbackType] || 'Chọn một';
+        return <span className="text-slate-700">{label}</span>;
+      }
     },
     {
       title: 'Keywords status',
@@ -490,7 +490,7 @@ export const CaliloFieldManager: React.FC = () => {
         {/* Summary Stats */}
         <div className="mt-6 text-sm text-slate-600">
           <span className="font-semibold text-slate-900">Tổng:</span>{' '}
-          {allFields.length} fields | {allFields.reduce((sum, f) => sum + f.optionCount, 0)} options | {allFields.reduce((sum, f) => sum + f.keywordCount, 0)} keywords
+          {allFields.length} fields
         </div>
       </div>
 
