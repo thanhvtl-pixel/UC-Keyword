@@ -354,7 +354,7 @@ export const CaliloFieldManager: React.FC = () => {
       }
     },
     {
-      title: 'Keywords status',
+      title: 'Trạng thái',
       key: 'status',
       width: 130,
       align: 'center' as const,
