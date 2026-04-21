@@ -10,6 +10,7 @@ interface TaskType {
   name: string;
   content: string;
   description: string;
+  prompt: string;
 }
 
 // Mock data
@@ -18,19 +19,22 @@ const initialTasks: TaskType[] = [
     id: '1',
     name: 'Kiểm tra tồn kho',
     content: 'Check số lượng e-voucher trên hệ thống kho',
-    description: 'Thao tác gọi API /inventory/check hoặc xem trên dashboard kho.'
+    description: 'Thao tác gọi API /inventory/check hoặc xem trên dashboard kho.',
+    prompt: 'Bạn là trợ lý ảo hỗ trợ kiểm tra tồn kho. Khi nhận yêu cầu kiểm tra số lượng voucher, hãy hỏi rõ Tên Chương trình và Mã doanh nghiệp.'
   },
   {
     id: '2',
     name: 'Gửi Email báo giá',
     content: 'Gửi email báo giá cho khách hàng doanh nghiệp',
-    description: 'Nhấn nút "Gửi Email", chọn template Báo Giá B2B, đính kèm file PDF.'
+    description: 'Nhấn nút "Gửi Email", chọn template Báo Giá B2B, đính kèm file PDF.',
+    prompt: 'Hãy tạo mẫu email báo giá chuyên nghiệp B2B. Yêu cầu có đầy đủ thông tin: Lời chào, Bảng giá đính kèm, Chính sách chiết khấu, và Thông tin liên hệ.'
   },
   {
     id: '3',
     name: 'Hủy giao dịch',
     content: 'Hủy đơn hàng nếu khách hàng yêu cầu refund',
-    description: 'Vào chi tiết đơn hàng -> Actions -> Hủy giao dịch -> Nhập lý do -> Xác nhận.'
+    description: 'Vào chi tiết đơn hàng -> Actions -> Hủy giao dịch -> Nhập lý do -> Xác nhận.',
+    prompt: 'Trước khi hủy giao dịch, hãy yêu cầu người dùng xác nhận lý do hủy và đảm bảo trạng thái đơn hàng là chưa sử dụng.'
   }
 ];
 
@@ -103,7 +107,8 @@ export const TaskManager: React.FC = () => {
     form.setFieldsValue({
       name: record.name,
       content: record.content,
-      description: record.description
+      description: record.description,
+      prompt: record.prompt
     });
     setIsModalOpen(true);
   };
@@ -139,7 +144,7 @@ export const TaskManager: React.FC = () => {
       title: 'Tên tác vụ',
       dataIndex: 'name',
       key: 'name',
-      width: 250,
+      width: 200,
       ...getColumnSearchProps('name'),
       render: (text: string) => <span className="font-semibold text-slate-900">{text}</span>
     },
@@ -147,14 +152,22 @@ export const TaskManager: React.FC = () => {
       title: 'Nội dung tác vụ',
       dataIndex: 'content',
       key: 'content',
-      width: 350,
+      width: 250,
       ...getColumnSearchProps('content'),
     },
     {
       title: 'Mô tả thao tác',
       dataIndex: 'description',
       key: 'description',
+      width: 250,
       render: (text: string) => <div className="whitespace-pre-wrap text-sm">{text}</div>
+    },
+    {
+      title: 'Prompt AI',
+      dataIndex: 'prompt',
+      key: 'prompt',
+      width: 300,
+      render: (text: string) => <div className="whitespace-pre-wrap text-sm italic text-slate-600">{text}</div>
     },
     {
       title: 'Actions',
@@ -246,6 +259,13 @@ export const TaskManager: React.FC = () => {
             rules={[{ required: true, message: 'Vui lòng nhập mô tả thao tác' }]}
           >
             <TextArea rows={3} placeholder="Mô tả các bước thực hiện thao tác này" />
+          </Form.Item>
+          <Form.Item
+            name="prompt"
+            label="Prompt AI"
+            rules={[{ required: true, message: 'Vui lòng nhập Prompt AI để hướng dẫn bot' }]}
+          >
+            <TextArea rows={3} placeholder="Ví dụ: Bạn là trợ lý ảo hỗ trợ... Khi nhận yêu cầu, hãy..." />
           </Form.Item>
         </Form>
       </Modal>
