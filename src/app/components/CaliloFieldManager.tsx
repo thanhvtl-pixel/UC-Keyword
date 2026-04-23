@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { Button, Radio, Tag, Table, Input, Space, Modal, message, Form, Select, InputNumber, Checkbox, Row, Col } from 'antd';
+import { Button, Radio, Tag, Table, Input, Space, Modal, message, Form, Select, InputNumber, Checkbox, Row, Col, Switch, Badge } from 'antd';
 import { EditOutlined, SearchOutlined, SaveOutlined, PlusOutlined, CloseOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import type { FilterConfirmProps } from 'antd/es/table/interface';
 import type { InputRef } from 'antd';
@@ -70,7 +70,7 @@ export const CaliloFieldManager: React.FC = () => {
         fieldType: item.system ? 'System' : 'Custom',
         optionCount: item.options ? item.options.filter(o => !o.readonly).length : 0,
         keywordCount: totalKeywords,
-        isActive: true,
+        isActive: item.active !== false,
       });
     });
     return sections;
@@ -138,6 +138,7 @@ export const CaliloFieldManager: React.FC = () => {
         section: activeSection,
         req: values.required,
         type: values.type, // Lưu lại kiểu nhập liệu
+        active: values.active,
         options: addedOptions.map(v => ({ val: v, syncStatus: 'pending' })), // Option mới mang trạng thái New
         system: false,
         syncStatus: 'pending'
@@ -290,6 +291,12 @@ export const CaliloFieldManager: React.FC = () => {
     );
   }
 
+  const handleToggleActive = (id: string, active: boolean) => {
+    const newFields = currentFields.map(f => f.id === id ? { ...f, active } : f);
+    setFields(newFields);
+    message.success(`Đã ${active ? 'bật' : 'tắt'} sử dụng field`);
+  };
+
   const columns = [
     {
       title: '#',
@@ -312,10 +319,17 @@ export const CaliloFieldManager: React.FC = () => {
       title: 'Field',
       dataIndex: 'fieldLabel',
       key: 'fieldLabel',
-      width: 200,
+      width: 250,
       ...getColumnSearchProps('fieldLabel' as any),
-      render: (text: string) => (
-        <span className="font-semibold text-slate-900">{text}</span>
+      render: (text: string, record: any) => (
+        <Space>
+          <span className="font-semibold text-slate-900">{text}</span>
+          {record.req && (
+            <Tag color="error" style={{ fontSize: '10px', lineHeight: '16px', borderRadius: '4px' }}>
+              Bắt buộc
+            </Tag>
+          )}
+        </Space>
       )
     },
     {
@@ -334,7 +348,7 @@ export const CaliloFieldManager: React.FC = () => {
       title: 'Kiểu nhập liệu',
       dataIndex: 'type',
       key: 'type',
-      width: 150,
+      width: 130,
       align: 'center' as const,
       render: (type: string, record: any) => {
         const typeMap: Record<string, string> = {
@@ -354,9 +368,23 @@ export const CaliloFieldManager: React.FC = () => {
       }
     },
     {
+      title: 'Sử dụng',
+      key: 'active',
+      width: 100,
+      align: 'center' as const,
+      render: (_: any, record: any) => (
+        <Switch 
+          size="small" 
+          checked={record.isActive} 
+          onChange={(checked) => handleToggleActive(record.id, checked)}
+          onClick={(e) => e.stopPropagation()}
+        />
+      )
+    },
+    {
       title: 'Trạng thái',
       key: 'status',
-      width: 130,
+      width: 110,
       align: 'center' as const,
       render: (_: any, record: any) => {
         if (record.syncStatus === 'pending') {

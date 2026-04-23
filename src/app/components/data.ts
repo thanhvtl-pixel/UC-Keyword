@@ -18,6 +18,7 @@ export interface FieldType {
   system?: boolean; // true for System fields, false/undefined for Custom fields
   options?: OptionType[];
   type?: string;
+  active?: boolean;
 }
 
 // ============================================
