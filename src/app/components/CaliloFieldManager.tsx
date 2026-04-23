@@ -387,6 +387,9 @@ export const CaliloFieldManager: React.FC = () => {
       width: 110,
       align: 'center' as const,
       render: (_: any, record: any) => {
+        if (!record.isActive) {
+          return <Tag color="default">Inactive</Tag>;
+        }
         if (record.syncStatus === 'pending') {
           return <Tag color="gold">New</Tag>;
         }
