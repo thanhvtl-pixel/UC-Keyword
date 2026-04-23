@@ -376,6 +376,7 @@ export const CaliloFieldManager: React.FC = () => {
         <Switch 
           size="small" 
           checked={record.isActive} 
+          disabled={record.fieldType === 'System'}
           onChange={(checked) => handleToggleActive(record.id, checked)}
           onClick={(e) => e.stopPropagation()}
         />
