@@ -15,10 +15,12 @@ import {
   DatabaseOutlined,
   TagsOutlined,
   UnorderedListOutlined,
-  AppstoreOutlined
+  AppstoreOutlined,
+  ProfileOutlined
 } from '@ant-design/icons';
 import { CaliloFieldManager } from './CaliloFieldManager';
 import { TaskManager } from './TaskManager';
+import { TicketManager } from './TicketManager';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 const { Sider, Content } = Layout;
@@ -96,6 +98,11 @@ export const UrCardPortal: React.FC = () => {
           key: 'task-manager',
           icon: <UnorderedListOutlined />,
           label: 'Quản lý tác vụ',
+        },
+        {
+          key: 'ticket-manager',
+          icon: <ProfileOutlined />,
+          label: 'Quản lý ticket',
         }
       ]
     },
@@ -112,6 +119,8 @@ export const UrCardPortal: React.FC = () => {
         return <CaliloFieldManager />;
       case 'task-manager':
         return <TaskManager />;
+      case 'ticket-manager':
+        return <TicketManager />;
       default:
         return (
           <div className="flex items-center justify-center h-full">
